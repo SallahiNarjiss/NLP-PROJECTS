@@ -1,0 +1,411 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "name": "Untitled13.ipynb",
+      "provenance": [],
+      "authorship_tag": "ABX9TyPPzAsSjvOWFduM46y23Cz/",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/SallahiNarjiss/Python-/blob/main/NLP%20-Reviews%20Classification\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "PilDgTkewtpv"
+      },
+      "source": [
+        "import numpy as np\n",
+        "import pandas as pd"
+      ],
+      "execution_count": 38,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "t21lw9w-3hHz",
+        "outputId": "3cec39c6-2dc1-4396-96ec-e3b1f0c2423d",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 419
+        }
+      },
+      "source": [
+        "reviews = pd.read_csv(\"yelp_dataset.txt\",delimiter='\\t',header=None)\n",
+        "reviews.columns = [\"Reviews\", \"Reviews_class\"]\n",
+        "reviews"
+      ],
+      "execution_count": 45,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>Reviews</th>\n",
+              "      <th>Reviews_class</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>0</th>\n",
+              "      <td>Wow... Loved this place.</td>\n",
+              "      <td>1</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>1</th>\n",
+              "      <td>Crust is not good.</td>\n",
+              "      <td>0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2</th>\n",
+              "      <td>Not tasty and the texture was just nasty.</td>\n",
+              "      <td>0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>3</th>\n",
+              "      <td>Stopped by during the late May bank holiday of...</td>\n",
+              "      <td>1</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>4</th>\n",
+              "      <td>The selection on the menu was great and so wer...</td>\n",
+              "      <td>1</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>...</th>\n",
+              "      <td>...</td>\n",
+              "      <td>...</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>995</th>\n",
+              "      <td>I think food should have flavor and texture an...</td>\n",
+              "      <td>0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>996</th>\n",
+              "      <td>Appetite instantly gone.</td>\n",
+              "      <td>0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>997</th>\n",
+              "      <td>Overall I was not impressed and would not go b...</td>\n",
+              "      <td>0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>998</th>\n",
+              "      <td>The whole experience was underwhelming, and I ...</td>\n",
+              "      <td>0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>999</th>\n",
+              "      <td>Then, as if I hadn't wasted enough of my life ...</td>\n",
+              "      <td>0</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "<p>1000 rows × 2 columns</p>\n",
+              "</div>"
+            ],
+            "text/plain": [
+              "                                               Reviews  Reviews_class\n",
+              "0                             Wow... Loved this place.              1\n",
+              "1                                   Crust is not good.              0\n",
+              "2            Not tasty and the texture was just nasty.              0\n",
+              "3    Stopped by during the late May bank holiday of...              1\n",
+              "4    The selection on the menu was great and so wer...              1\n",
+              "..                                                 ...            ...\n",
+              "995  I think food should have flavor and texture an...              0\n",
+              "996                           Appetite instantly gone.              0\n",
+              "997  Overall I was not impressed and would not go b...              0\n",
+              "998  The whole experience was underwhelming, and I ...              0\n",
+              "999  Then, as if I hadn't wasted enough of my life ...              0\n",
+              "\n",
+              "[1000 rows x 2 columns]"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 45
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "oL1oocvp4Agy",
+        "outputId": "084200a0-9fdc-40f3-98e4-7f4212f74baf",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 102
+        }
+      },
+      "source": [
+        "import re\n",
+        "import nltk\n",
+        "import string\n",
+        "from nltk.tokenize import word_tokenize\n",
+        "from nltk.corpus import stopwords\n",
+        "from nltk.stem.porter import PorterStemmer\n",
+        "import nltk\n",
+        "nltk.download('punkt')\n",
+        "nltk.download('stopwords')"
+      ],
+      "execution_count": 40,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "[nltk_data] Downloading package punkt to /root/nltk_data...\n",
+            "[nltk_data]   Package punkt is already up-to-date!\n",
+            "[nltk_data] Downloading package stopwords to /root/nltk_data...\n",
+            "[nltk_data]   Package stopwords is already up-to-date!\n"
+          ],
+          "name": "stdout"
+        },
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "True"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 40
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "Hr-fv2bO4FJ-",
+        "outputId": "101fec67-e66e-4e7d-fc34-dea687fa6468",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 357
+        }
+      },
+      "source": [
+        "def result(df):\n",
+        "    Text = list()\n",
+        "    lines = df[\"Reviews\"].values.tolist()\n",
+        "    for review in lines:\n",
+        "        review = review.lower()\n",
+        "        pattern = re.compile('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')\n",
+        "        review = pattern.sub('', review)\n",
+        "        review = re.sub(r\"[,.\\\"!@#$%^&*(){}?/;`~:<>+=-]\", \"\", review)\n",
+        "        tokens = word_tokenize(review)\n",
+        "        table = str.maketrans('', '', string.punctuation)\n",
+        "        stripped = [w.translate(table) for w in tokens]\n",
+        "        words = [word for word in stripped if word.isalpha()]\n",
+        "        stop_words = set(stopwords.words(\"english\"))\n",
+        "        stop_words.discard(\"not\")\n",
+        "        PS = PorterStemmer()\n",
+        "#         words = [w for w in words if not w in stop_words]\n",
+        "        words = [PS.stem(w) for w in words if not w in stop_words]\n",
+        "        words = ' '.join(words)\n",
+        "        Text.append(words)\n",
+        "    return Text\n",
+        "\n",
+        "all_reviews = result(reviews)\n",
+        "all_reviews[0:20]"
+      ],
+      "execution_count": 41,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "['wow love place',\n",
+              " 'crust not good',\n",
+              " 'not tasti textur nasti',\n",
+              " 'stop late may bank holiday rick steve recommend love',\n",
+              " 'select menu great price',\n",
+              " 'get angri want damn pho',\n",
+              " 'honeslti nt tast fresh',\n",
+              " 'potato like rubber could tell made ahead time kept warmer',\n",
+              " 'fri great',\n",
+              " 'great touch',\n",
+              " 'servic prompt',\n",
+              " 'would not go back',\n",
+              " 'cashier care ever say still end wayyy overpr',\n",
+              " 'tri cape cod ravoli chickenwith cranberrymmmm',\n",
+              " 'disgust pretti sure human hair',\n",
+              " 'shock sign indic cash',\n",
+              " 'highli recommend',\n",
+              " 'waitress littl slow servic',\n",
+              " 'place not worth time let alon vega',\n",
+              " 'not like']"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 41
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "hMSH47pG5h1S",
+        "outputId": "e04c8b67-4e35-4992-b9ba-8b67637d4035",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 51
+        }
+      },
+      "source": [
+        "from sklearn.feature_extraction.text import CountVectorizer\n",
+        "CV = CountVectorizer(min_df=3)   \n",
+        "X = CV.fit_transform(all_reviews).toarray()\n",
+        "\n",
+        "y = reviews[[\"Reviews_class\"]].to_numpy()\n",
+        "print(np.shape(X))\n",
+        "print(np.shape(y))"
+      ],
+      "execution_count": 36,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "(1000, 467)\n",
+            "(1000, 1)\n"
+          ],
+          "name": "stdout"
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "f-0HoMq_NKst"
+      },
+      "source": [
+        "from sklearn.model_selection import train_test_split\n",
+        "X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 4)\n",
+        "from sklearn.metrics import accuracy_score, f1_score, precision_score,recall_score"
+      ],
+      "execution_count": 51,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "GzJR-3q9NtWa",
+        "outputId": "d2dd7ba1-289f-4574-9deb-204bfd52b8d2",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 156
+        }
+      },
+      "source": [
+        "from xgboost import XGBClassifier\n",
+        "model= XGBClassifier()\n",
+        "model.fit(X_train,y_train)\n",
+        "\n",
+        "print('Precision:',precision_score(y_test, model.predict(X_test), average='macro'))\n",
+        "print('Recall:',recall_score(y_test, model.predict(X_test), average='macro'))\n",
+        "print('F1 score:',f1_score(y_test,model.predict(X_test), average='macro'))"
+      ],
+      "execution_count": 54,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "/usr/local/lib/python3.6/dist-packages/sklearn/preprocessing/_label.py:235: DataConversionWarning: A column-vector y was passed when a 1d array was expected. Please change the shape of y to (n_samples, ), for example using ravel().\n",
+            "  y = column_or_1d(y, warn=True)\n",
+            "/usr/local/lib/python3.6/dist-packages/sklearn/preprocessing/_label.py:268: DataConversionWarning: A column-vector y was passed when a 1d array was expected. Please change the shape of y to (n_samples, ), for example using ravel().\n",
+            "  y = column_or_1d(y, warn=True)\n"
+          ],
+          "name": "stderr"
+        },
+        {
+          "output_type": "stream",
+          "text": [
+            "Precision: 0.7940170940170941\n",
+            "Recall: 0.7584134615384616\n",
+            "F1 score: 0.7557109072481094\n"
+          ],
+          "name": "stdout"
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "1DaULXrnPN9a",
+        "outputId": "e2a140b4-d2f9-4803-d23b-03b9701f382c",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 122
+        }
+      },
+      "source": [
+        "from sklearn.svm import SVC,LinearSVC\n",
+        "svm = SVC()\n",
+        "svm.fit(X_train,y_train)\n",
+        "\n",
+        "print('Precision:',precision_score(y_test, svm.predict(X_test), average='macro'))\n",
+        "print('Recall:',recall_score(y_test, svm.predict(X_test), average='macro'))\n",
+        "print('F1 score:',f1_score(y_test,svm.predict(X_test), average='macro'))"
+      ],
+      "execution_count": 56,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "/usr/local/lib/python3.6/dist-packages/sklearn/utils/validation.py:760: DataConversionWarning: A column-vector y was passed when a 1d array was expected. Please change the shape of y to (n_samples, ), for example using ravel().\n",
+            "  y = column_or_1d(y, warn=True)\n"
+          ],
+          "name": "stderr"
+        },
+        {
+          "output_type": "stream",
+          "text": [
+            "Precision: 0.8373294749896651\n",
+            "Recall: 0.8269230769230769\n",
+            "F1 score: 0.8279178054458953\n"
+          ],
+          "name": "stdout"
+        }
+      ]
+    }
+  ]
+}
